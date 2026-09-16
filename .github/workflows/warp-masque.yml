@@ -101,3 +101,5 @@ jobs:
           path: dist/
           retention-days: ${{ github.event.inputs.retention_days || 7 }}
           if-no-files-found: error
+
+# auto-dispatch 触发验证 20260916
