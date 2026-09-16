@@ -57,11 +57,14 @@ jobs:
       - name: 生成 W2 provider 文件（14 个 198.2/199.2 稳定节点）
         run: python3 scripts/gen_w2_provider.py dist/warp-masque.yaml dist/w2-provider.yaml
 
+      - name: 生成 v2rayN 自包含配置（14 节点 + inbounds + 规则）
+        run: python3 scripts/gen_v2rayn_config.py dist/w2-provider.yaml dist/w2-v2rayn.yaml
+
       - name: 校验配置可加载
         run: |
           set -euo pipefail
           URL=$(curl -sL https://api.github.com/repos/MetaCubeX/mihomo/releases \
-                | grep -o 'https://[^\"]*mihomo-linux-amd64-alpha[^\"]*\.gz' | head -1)
+                | grep -o 'https://[^"]*mihomo-linux-amd64-alpha[^"]*\.gz' | head -1)
           curl -sL -o mihomo.gz "$URL"
           gunzip -f mihomo.gz
           chmod +x mihomo
@@ -70,20 +73,26 @@ jobs:
           # -t 只做配置解析校验，不起服务
           ./mihomo -t -d check
           echo "完整配置校验通过"
+          # 校验 v2rayN 自包含配置也可加载
+          mkdir -p check2
+          cp dist/w2-v2rayn.yaml check2/config.yaml
+          ./mihomo -t -d check2
+          echo "v2rayN 自包含配置校验通过"
 
-      - name: 提交 W2 provider 到 main 分支供 mihomo 拉取
+      - name: 提交 W2 provider 与 v2rayN 配置到 main 分支
         run: |
           set -euo pipefail
           cp dist/w2-provider.yaml w2-provider.yaml
+          cp dist/w2-v2rayn.yaml w2-v2rayn.yaml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git ls-files --error-unmatch w2-provider.yaml >/dev/null 2>&1 && git diff --quiet -- w2-provider.yaml; then
-            echo "W2 provider 无变化，跳过提交"
+          git add w2-provider.yaml w2-v2rayn.yaml
+          if git diff --quiet --cached -- w2-provider.yaml w2-v2rayn.yaml; then
+            echo "W2 provider 与 v2rayN 配置均无变化，跳过提交"
           else
-            git add w2-provider.yaml
-            git commit -m "chore: auto-update W2 provider $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git commit -m "chore: auto-update W2 provider and v2rayN config $(date -u +%Y-%m-%dT%H:%M:%SZ)"
             git push origin HEAD:main
-            echo "W2 provider 已更新到 main"
+            echo "W2 provider 与 v2rayN 配置已更新到 main"
           fi
 
       - name: 打包凭据与配置
@@ -92,6 +101,7 @@ jobs:
           test -s dist/warp-masque.yaml
           test -s dist/warp-masque-shadowrocket.txt
           test -s dist/w2-provider.yaml
+          test -s dist/w2-v2rayn.yaml
           ls -l dist
 
       - name: 上传 artifact
