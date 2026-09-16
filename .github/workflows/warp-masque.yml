@@ -1,10 +1,13 @@
 name: 生成 WARP MASQUE 配置
 
 on:
+  # WARP 节点不能频繁刷新，定时每 6 天跑一次（05:00 UTC ≈ 北京时间 13:00）
+  schedule:
+    - cron: '0 5 */6 * *'
   workflow_dispatch:
     inputs:
       device_name:
-        description: 设备名（WARP 后台显示用）
+        description: 设备名（WARP 后台显示用，默认 gh-actions）
         required: false
         default: gh-actions
       retention_days:
@@ -13,7 +16,7 @@ on:
         default: '7'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   generate:
@@ -51,11 +54,14 @@ jobs:
       - name: 生成 mihomo 配置
         run: python3 scripts/gen_masque.py config.json dist
 
+      - name: 生成 W2 provider 文件（14 个 198.2/199.2 稳定节点）
+        run: python3 scripts/gen_w2_provider.py dist/warp-masque.yaml dist/w2-provider.yaml
+
       - name: 校验配置可加载
         run: |
           set -euo pipefail
           URL=$(curl -sL https://api.github.com/repos/MetaCubeX/mihomo/releases \
-                | grep -o 'https://[^"]*mihomo-linux-amd64-alpha[^"]*\.gz' | head -1)
+                | grep -o 'https://[^\"]*mihomo-linux-amd64-alpha[^\"]*\.gz' | head -1)
           curl -sL -o mihomo.gz "$URL"
           gunzip -f mihomo.gz
           chmod +x mihomo
@@ -63,13 +69,29 @@ jobs:
           cp dist/warp-masque.yaml check/config.yaml
           # -t 只做配置解析校验，不起服务
           ./mihomo -t -d check
-          echo "配置校验通过"
+          echo "完整配置校验通过"
+
+      - name: 提交 W2 provider 到 main 分支供 mihomo 拉取
+        run: |
+          set -euo pipefail
+          cp dist/w2-provider.yaml w2-provider.yaml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet -- w2-provider.yaml; then
+            echo "W2 provider 无变化，跳过提交"
+          else
+            git add w2-provider.yaml
+            git commit -m "chore: auto-update W2 provider $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push origin HEAD:main
+            echo "W2 provider 已更新到 main"
+          fi
 
       - name: 打包凭据与配置
         run: |
           cp config.json dist/usque-config.json
           test -s dist/warp-masque.yaml
           test -s dist/warp-masque-shadowrocket.txt
+          test -s dist/w2-provider.yaml
           ls -l dist
 
       - name: 上传 artifact
