@@ -77,7 +77,7 @@ jobs:
           cp dist/w2-provider.yaml w2-provider.yaml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          if git diff --quiet -- w2-provider.yaml; then
+          if git ls-files --error-unmatch w2-provider.yaml >/dev/null 2>&1 && git diff --quiet -- w2-provider.yaml; then
             echo "W2 provider 无变化，跳过提交"
           else
             git add w2-provider.yaml
