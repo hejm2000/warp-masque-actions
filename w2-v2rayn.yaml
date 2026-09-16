@@ -1,5 +1,63 @@
-# WARP MASQUE 可用节点子集（198.2/199.2 段，大流量实测通过）
+# WARP MASQUE - v2rayN 订阅配置（14 个 198.2/199.2 稳定节点）
 # 由 GitHub Actions 自动生成（warp-masque.yml），请勿手工编辑
+#
+# 用法：v2rayN → 导入订阅 → 填本文件 raw URL → 自动识别为 mihomo 配置
+# 协议：type: masque（usque 自研，QUIC/HTTP3 + ECDSA 客户端证书，需 mihomo 核心）
+
+mixed-port: 7890
+allow-lan: false
+mode: rule
+log-level: info
+ipv6: true
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: 'off'
+external-controller: 127.0.0.1:9090
+
+profile:
+  store-selected: true
+
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - '+.push.apple.com'
+    - '+.apple.com'
+
+dns:
+  enable: true
+  listen: 127.0.0.1:1053
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '+.lan'
+    - '+.local'
+    - '*.msftconnecttest.com'
+    - '*.msftncsi.com'
+  default-nameserver:
+    - 223.5.5.5
+    - 119.29.29.29
+  nameserver:
+    - https://223.5.5.5/dns-query
+    - https://1.12.12.12/dns-query
+  proxy-server-nameserver:
+    - https://223.5.5.5/dns-query
+  nameserver-policy:
+    'geosite:cn,private':
+      - https://223.5.5.5/dns-query
+      - https://1.12.12.12/dns-query
+    'geosite:geolocation-!cn':
+      - https://1.1.1.1/dns-query
+      - https://8.8.8.8/dns-query
+
 proxies:
   - name: WARP-198.2-443
     type: masque
@@ -182,3 +240,90 @@ proxies:
     udp: true
     remote-dns-resolve: true
     dns: [1.1.1.1, 2606:4700:4700::1111]
+
+proxy-groups:
+  - name: 🚀 节点选择
+    type: select
+    proxies:
+      - ♻️ 自动选择
+      - 🔄 故障转移
+      - ☑️ 手动切换
+      - DIRECT
+
+  - name: ☑️ 手动切换
+    type: select
+    proxies:
+      - WARP-198.2-443
+      - WARP-198.2-500
+      - WARP-198.2-1701
+      - WARP-198.2-4500
+      - WARP-198.2-4443
+      - WARP-198.2-8443
+      - WARP-198.2-8095
+      - WARP-199.2-443
+      - WARP-199.2-500
+      - WARP-199.2-1701
+      - WARP-199.2-4500
+      - WARP-199.2-4443
+      - WARP-199.2-8443
+      - WARP-199.2-8095
+
+  - name: ♻️ 自动选择
+    type: url-test
+    url: http://www.gstatic.com/generate_204
+    interval: 300
+    tolerance: 50
+    lazy: false
+    proxies:
+      - WARP-198.2-443
+      - WARP-198.2-500
+      - WARP-198.2-1701
+      - WARP-198.2-4500
+      - WARP-198.2-4443
+      - WARP-198.2-8443
+      - WARP-198.2-8095
+      - WARP-199.2-443
+      - WARP-199.2-500
+      - WARP-199.2-1701
+      - WARP-199.2-4500
+      - WARP-199.2-4443
+      - WARP-199.2-8443
+      - WARP-199.2-8095
+
+  - name: 🔄 故障转移
+    type: fallback
+    url: http://www.gstatic.com/generate_204
+    interval: 180
+    proxies:
+      - WARP-198.2-443
+      - WARP-198.2-500
+      - WARP-198.2-1701
+      - WARP-198.2-4500
+      - WARP-198.2-4443
+      - WARP-198.2-8443
+      - WARP-198.2-8095
+      - WARP-199.2-443
+      - WARP-199.2-500
+      - WARP-199.2-1701
+      - WARP-199.2-4500
+      - WARP-199.2-4443
+      - WARP-199.2-8443
+      - WARP-199.2-8095
+
+  - name: 🎯 全球直连
+    type: select
+    proxies:
+      - DIRECT
+      - 🚀 节点选择
+      - ♻️ 自动选择
+
+  - name: 🐟 漏网之鱼
+    type: select
+    proxies:
+      - 🚀 节点选择
+      - 🎯 全球直连
+
+rules:
+  - GEOIP,LAN,🎯 全球直连,no-resolve
+  - GEOIP,CN,🎯 全球直连
+  - MATCH,🐟 漏网之鱼
