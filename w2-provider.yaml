@@ -1,0 +1,184 @@
+# WARP MASQUE 可用节点子集（198.2/199.2 段，大流量实测通过）
+# 由 GitHub Actions 自动生成（warp-masque.yml），请勿手工编辑
+proxies:
+  - name: WARP-198.2-443
+    type: masque
+    server: 162.159.198.2
+    port: 443
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-198.2-500
+    type: masque
+    server: 162.159.198.2
+    port: 500
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-198.2-1701
+    type: masque
+    server: 162.159.198.2
+    port: 1701
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-198.2-4500
+    type: masque
+    server: 162.159.198.2
+    port: 4500
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-198.2-4443
+    type: masque
+    server: 162.159.198.2
+    port: 4443
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-198.2-8443
+    type: masque
+    server: 162.159.198.2
+    port: 8443
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-198.2-8095
+    type: masque
+    server: 162.159.198.2
+    port: 8095
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-443
+    type: masque
+    server: 162.159.199.2
+    port: 443
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-500
+    type: masque
+    server: 162.159.199.2
+    port: 500
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-1701
+    type: masque
+    server: 162.159.199.2
+    port: 1701
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-4500
+    type: masque
+    server: 162.159.199.2
+    port: 4500
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-4443
+    type: masque
+    server: 162.159.199.2
+    port: 4443
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-8443
+    type: masque
+    server: 162.159.199.2
+    port: 8443
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
+
+  - name: WARP-199.2-8095
+    type: masque
+    server: 162.159.199.2
+    port: 8095
+    private-key: MHcCAQEEIBlb7vGHnDZgQAkzP+5JUhj2YrqfsJVn2HzsIj61Jt7AoAoGCCqGSM49AwEHoUQDQgAEEAcHGD58YN9cO1O/UIC4OaN3x2k4IC6LXPNnvYORH83sbeCheaNPBYbLN4ynWmTnZrEorapGjccO+2WtkjjOTg==
+    public-key: MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEIaU7MToJm9NKp8YfGxR6r+/h4mcG7SxI8tsW8OR1A5tv/zCzVbCRRh2t87/kxnP6lAy0lkr7qYwu+ox+k3dr6w==
+    ip: 172.16.0.2
+    ipv6: 2606:4700:110:837e:9cc7:61fb:f386:b548
+    mtu: 1280
+    udp: true
+    remote-dns-resolve: true
+    dns: [1.1.1.1, 2606:4700:4700::1111]
