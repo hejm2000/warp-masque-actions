@@ -314,19 +314,24 @@ ${p(picks)}
       - ♻️ 自动选择`;
 }
 
-export function buildConfig(warp, opera, proton, wind) {
+export function buildConfig(warp, opera, proton, wind, opts = {}) {
   const { entries, proxies, v4Entries } = buildEntries(warp);
+  // direct 模式：只留 WARP 直连接入点，不含 combo/Proton/Windscribe 节点。
+  // 给稳定版 mihomo 用——它不认 dialer-proxy，加载 combo 节点会报错。
+  const direct = !!opts.direct;
 
   // 笛卡尔积：任一接入点或任一落地失效，其他组合仍可用
   const byLoc = {};
-  for (const land of opera.landings) {
-    for (const ent of entries) {
-      const name = `${land.tag}@${ent}`;
-      (byLoc[land.loc] ||= []).push(name);
-      proxies.push(
-        `  - {name: "${name}", type: http, server: ${land.ip}, port: ${land.port}, ` +
-        `username: ${opera.username}, password: ${opera.password}, tls: true, ` +
-        `sni: ${land.host}, skip-cert-verify: false, dialer-proxy: ${ent}}`);
+  if (!direct) {
+    for (const land of opera.landings) {
+      for (const ent of entries) {
+        const name = `${land.tag}@${ent}`;
+        (byLoc[land.loc] ||= []).push(name);
+        proxies.push(
+          `  - {name: "${name}", type: http, server: ${land.ip}, port: ${land.port}, ` +
+          `username: ${opera.username}, password: ${opera.password}, tls: true, ` +
+          `sni: ${land.host}, skip-cert-verify: false, dialer-proxy: ${ent}}`);
+      }
     }
   }
   const combos = Object.values(byLoc).reduce((a, b) => a + b.length, 0);
@@ -338,7 +343,7 @@ export function buildConfig(warp, opera, proton, wind) {
   // 分到 IPv6 接入点的话，没有 IPv6 的机器上会全部 network is unreachable。
   let protonNames = [];
   const protonByCC = {};   // 国家 -> 该国节点名，用来按国家分组
-  if (proton && proton.servers && proton.servers.length) {
+  if (!direct && proton && proton.servers && proton.servers.length) {
     proton.servers.forEach((srv, i) => {
       const ent = v4Entries[i % v4Entries.length];
       protonNames.push(srv.name);
@@ -363,7 +368,7 @@ export function buildConfig(warp, opera, proton, wind) {
   // 只从 v4Entries 选，理由同 Proton：纯 IPv4 的机器上 v6 接入点不可达。
   const windNames = [];
   const windByLoc = {};
-  if (wind && wind.servers && wind.servers.length) {
+  if (!direct && wind && wind.servers && wind.servers.length) {
     wind.servers.forEach((srv, i) => {
       const ent = v4Entries[i % v4Entries.length];
       const name = `WS-${srv.tag}`;
@@ -402,10 +407,10 @@ ${q(names)}`).join("\n\n");
     proxies:
 ${q(names)}`).join("\n\n");
 
-  const picks = [...locNames, "WARP直连"];
+  const picks = direct ? ["WARP直连"] : [...locNames, "WARP直连"];
   if (protonNames.length) picks.push("Proton线路", ...protonCCNames);
   if (windNames.length) picks.push("Windscribe线路", ...windLocNames);
-  const locDefs = Object.entries(byLoc).map(([loc, tags]) => `  - name: ${loc}线路
+  const locDefs = (direct ? [] : Object.entries(byLoc)).map(([loc, tags]) => `  - name: ${loc}线路
     type: url-test
     url: http://www.gstatic.com/generate_204
     interval: 300
@@ -419,7 +424,7 @@ ${q(tags)}`).join("\n\n");
   const yaml = `# Opera VPN over Cloudflare WARP (MASQUE)
 # 由 Cloudflare Worker 生成于 ${new Date().toISOString()}
 #
-# 聚合版：套娃线路和 WARP 直连都在这一份里。
+${direct ? "# 直连版：只含 WARP 直连接入点，稳定版/alpha 都能加载。" : "# 聚合版：套娃线路和 WARP 直连都在这一份里。"}
 #
 #   亚洲/欧洲/美洲线路  本机 -> MASQUE -> Opera 落地 -> 目标（能换出口国家）
 #   WARP直连            本机 -> MASQUE -> 目标（出口是 CF 自己的 IP，快）
@@ -520,6 +525,6 @@ ${rules}
   - MATCH,🐟 漏网之鱼
 `;
 
-  return { yaml, entries: entries.length, landings: opera.landings.length,
+  return { yaml, direct, entries: entries.length, landings: opera.landings.length,
            combos, proton: protonNames.length, wind: windNames.length };
 }

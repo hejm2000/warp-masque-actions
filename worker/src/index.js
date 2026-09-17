@@ -20,6 +20,7 @@ import {
 
 const K_WARP = "warp:device";     // WARP 注册信息，长期复用
 const K_CFG = "config:yaml";      // 聚合配置（套娃线路 + WARP 直连）
+const K_CFG_DIRECT = "config:yaml:direct"; // 直连版配置（只含 WARP 直连节点）
 const K_STATE = "state:meta";     // 状态元数据，给 UI 用
 const K_CRED = "auth:cred";       // 密码哈希 + 盐
 const K_SET = "settings";         // 订阅路径等设置
@@ -27,6 +28,7 @@ const K_CLAIM = "auth:claim";     // 初始化时的抢占标记
 const K_PROTON = "proton:cred";   // Proton 凭据（由流水线推送）
 const K_PUSH = "proton:token";    // 流水线的写入令牌
 const K_WIND = "wind:account";    // Windscribe 账号，长期复用（连着开户会被降额）
+const K_PULL = "pull:token";      // 永久中继令牌（GitHub Actions 拉配置用，不过期）
 const K_LOCK = "rebuild:lock";    // 重建锁，防并发重复注册
 const COOKIE = "om_session";
 const DEFAULT_SUB = "sub";
@@ -86,8 +88,9 @@ async function getWind(env) {
   return await fetchWindscribe(acc);
 }
 
-/** 重建配置。WARP 复用，Opera 每次重取（凭据会过期）。 */
-async function rebuild(env, { forceWarp = false } = {}) {
+/** 重建配置。WARP 复用，Opera 每次重取（凭据会过期）。
+ * direct 为 true 时只生成直连版（不含 combo 节点），给稳定版 mihomo 用。 */
+async function rebuild(env, { forceWarp = false, direct = false } = {}) {
   const warp = await getWarp(env, forceWarp);
   const opera = await fetchOpera();
   // Proton 凭据是流水线推来的，没有就跳过，不影响其他线路
@@ -104,7 +107,7 @@ async function rebuild(env, { forceWarp = false } = {}) {
     windErr = e.message;
   }
   const { yaml, entries, landings, combos, proton: pn, wind: wn } =
-    buildConfig(warp, opera, proton, wind);
+    buildConfig(warp, opera, proton, wind, { direct });
 
   const now = Date.now();
   const state = {
@@ -157,6 +160,30 @@ async function ensureConfig(env) {
     }
   }
   return (await env.KV.get(K_CFG)) || yaml;
+}
+
+/** 直连版配置的按需重建。逻辑同 ensureConfig，但用独立的 KV 键。
+ * 直连版不含 Opera 凭据（只有 WARP 私钥），给稳定版 mihomo 和中继仓库用。 */
+async function ensureDirectConfig(env) {
+  const state = await env.KV.get(K_STATE, "json");
+  const yaml = await env.KV.get(K_CFG_DIRECT);
+  if (yaml && isFresh(state)) return yaml;
+
+  const lock = await env.KV.get("rebuild:lock:direct");
+  if (lock && Date.now() - Number(lock) < 90000) {
+    if (yaml) return yaml;
+  } else {
+    await env.KV.put("rebuild:lock:direct", String(Date.now()), { expirationTtl: 120 });
+    try {
+      const warp = await getWarp(env);
+      const opera = await fetchOpera();
+      const { yaml: dy } = buildConfig(warp, opera, null, null, { direct: true });
+      await env.KV.put(K_CFG_DIRECT, dy);
+    } finally {
+      await env.KV.delete("rebuild:lock:direct");
+    }
+  }
+  return (await env.KV.get(K_CFG_DIRECT)) || yaml;
 }
 
 export default {
@@ -229,6 +256,28 @@ export default {
           // 文件名不加引号：部分客户端不解析引号，会把 \"x\" 当成文件名的一部分
           "content-disposition": "attachment; filename=opera-masque.yaml",
           "profile-update-interval": "4",
+          "cache-control": "no-store",
+        },
+      });
+    }
+
+    // ---- 中继拉取：GitHub Actions 定期拉配置存到仓库 ----
+    // 令牌永久有效（KV 存储），泄露了在管理页换掉即可。
+    // 支持 ?direct=1 拿直连版（只含 WARP 直连节点，稳定版 mihomo 可加载）。
+    if (path.startsWith("/pull/") && req.method === "GET") {
+      const tk = await env.KV.get(K_PULL);
+      const got = path.slice(6);
+      if (!tk || !got || !safeEqual(got, tk)) return notFound();
+      const yaml = url.searchParams.get("direct") === "1"
+        ? await ensureDirectConfig(env)
+        : await ensureConfig(env);
+      if (!yaml) {
+        return new Response("配置生成失败，稍后重试", {
+          status: 503, headers: { "content-type": "text/plain; charset=utf-8" } });
+      }
+      return new Response(yaml, {
+        headers: {
+          "content-type": "text/yaml; charset=utf-8",
           "cache-control": "no-store",
         },
       });
@@ -327,6 +376,7 @@ export default {
       const state = await env.KV.get(K_STATE, "json");
       const token = await signToken(cred);
       const pushToken = await env.KV.get(K_PUSH);
+      const pullToken = await env.KV.get(K_PULL);
       const protonCred = await env.KV.get(K_PROTON, "json");
       // 用量是实时问 Windscribe 的，问不到就不显示，不影响页面其他部分
       let windUsage = null;
@@ -335,7 +385,7 @@ export default {
         try { windUsage = await fetchSession(wa); } catch { windUsage = null; }
       }
       return html(renderUI(state, url.host, subPath, token, cred,
-                           pushToken, protonCred, windUsage));
+                           pushToken, protonCred, windUsage, pullToken));
     }
 
     // ---- 以下都要登录。未登录一律 404，不用 401 ----
@@ -344,6 +394,14 @@ export default {
 
     if (path === "/api/state") {
       return json((await env.KV.get(K_STATE, "json")) || {});
+    }
+
+    // 生成/轮换中继拉取令牌（GitHub Actions 拉配置用）
+    if (path === "/api/pull/token" && req.method === "POST") {
+      const t = crypto.randomUUID().replace(/-/g, "") +
+                crypto.randomUUID().replace(/-/g, "");
+      await env.KV.put(K_PULL, t);
+      return json({ ok: true, token: t, msg: "令牌已更新，旧的立即失效" });
     }
 
     // 重新生成流水线的写入令牌

@@ -197,7 +197,7 @@ async function go(e){
 </body></html>`;
 }
 
-export function renderUI(state, host, sp, token, cred, pushToken, protonCred, windUsage) {
+export function renderUI(state, host, sp, token, cred, pushToken, protonCred, windUsage, pullToken) {
   const s = state || {};
   const warp = s.warp || {};
   const stat = s.stats || {};
@@ -211,6 +211,7 @@ export function renderUI(state, host, sp, token, cred, pushToken, protonCred, wi
   const fmt = (d) => d ? d.toISOString().replace("T", " ").slice(0, 19) + " UTC" : "—";
   const sub = `https://${host}${sp}?token=${token}`;
   const pushUrl = pushToken ? `https://${host}/push/${pushToken}` : "";
+  const pullUrl = pullToken ? `https://${host}/pull/${pullToken}` : "";
   const pExp = protonCred && protonCred.expiresAt
     ? new Date(protonCred.expiresAt * 1000) : null;
   const windInfo = s.wind || null;
@@ -392,6 +393,26 @@ export function renderUI(state, host, sp, token, cred, pushToken, protonCred, wi
         地址里带令牌，只能写 Proton 凭据、动不了管理页；泄露了点「换一个」。
         ${protonCred ? '<br><a href="#" onclick="go(\'/api/proton/clear\');return false" ' +
           'style="color:var(--red)">清除 Proton 凭据</a>' : ""}
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-t">GitHub 中继</div>
+      ${pullToken ? `
+      <div class="row"><span class="k">状态</span><span class="v ok">已启用</span></div>
+      ` : `
+      <div class="row"><span class="k">状态</span><span class="v warn">未启用</span></div>
+      `}
+      <div class="sub">
+        <input id="lu" value="${pullUrl || "点右边生成"}" readonly>
+        <button onclick="cp('lu')">复制</button>
+        <button class="gh" onclick="go('/api/pull/token')">${
+          pullToken ? "换一个" : "生成"}</button>
+      </div>
+      <div class="note">
+        GitHub Actions 定期从这个地址拉配置，存到仓库里做中转订阅。<br>
+        令牌<b>永久有效</b>（不是 7 天会话 token），泄露了点「换一个」。<br>
+        Actions 拉取两个版本：聚合版（alpha 用）和直连版（稳定版用，URL 加 <code>?direct=1</code>）。
       </div>
     </div>
 
